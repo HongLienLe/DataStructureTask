@@ -17,4 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DataStructureTask\DataStructureTask.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ExecuteUserInputTest.cs" />
+  </ItemGroup>
 </Project>

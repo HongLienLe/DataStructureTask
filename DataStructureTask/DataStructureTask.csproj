@@ -12,5 +12,7 @@
   <ItemGroup>
     <Compile Remove="IObservation.cs" />
     <Compile Remove="Error.cs" />
+    <Compile Remove="ExecuteUserInput.cs" />
+    <Compile Remove="IExecuteUserInput.cs" />
   </ItemGroup>
 </Project>

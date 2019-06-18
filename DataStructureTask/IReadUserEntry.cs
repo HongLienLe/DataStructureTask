@@ -3,10 +3,10 @@ namespace DataStructureTask
 {
     public interface IReadUserEntry
     {
-        ReadUserEntry SetProperties();
+        void ExecuteUserInput(string input);
         string Command { get; set; }
         int Index { get; set; }
-        int TimeStamp { get; set; }
+        long TimeStamp { get; set; }
         string Data { get; set; }
     }
 }

@@ -7,8 +7,8 @@ namespace DataStructureTask
         Dictionary<int, List<Observation>> GetHistoryOfObservationData();
         void Create(int id, int timeStamp, string data);
         void Update(int id, int timeStamp, string data);
-        void Delete(int id, int timeStamp);
         void Delete(int id);
+        void Delete(int id, int timeStamp);
         void Get(int id, int timeStamp);
         void Latest(int id);
     }

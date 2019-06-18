@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DataStructureTask
@@ -6,98 +7,136 @@ namespace DataStructureTask
     //Read users Input 
     public class ReadUserEntry : IReadUserEntry
     {
-
         public string Command { get; set; }
         public int Index { get; set; }
-        public int TimeStamp { get; set; }
+        public long TimeStamp { get; set; }
         public string Data { get; set; }
+        string[] allCommands = { "GET", "LATEST", "DELETE", "QUIT", "CREATE", "UPDATE" };
 
-
-        public ReadUserEntry SetProperties()
+        public string[] ProcessUserInput(string userInput)
         {
-            string[] allCommands = { "GET", "LATEST", "DELETE", "QUIT", "CREATE", "UPDATE" };
-            string[] commandsThatDontRequireData = {"GET","LATEST","DELETE","QUIT" };
-            string userInput = Console.ReadLine();
-
-            ReadUserEntry userEntry = new ReadUserEntry();
-           var input = ReadUserInput(userInput);
-            userEntry.Command = CallCommand(input);
-
-            if (!allCommands.Contains(userEntry.Command))
-            {
-                Console.WriteLine("ERR Command not valid.");
-            }
-
-            if (!userEntry.Command.Contains("QUIT"))
-            {
-                userEntry.Index = ReturnsIndex(input);
-
-                if (!userEntry.Command.Contains("LATEST"))
-                {
-                    userEntry.TimeStamp = ReturnsTimeStamp(input);
-                    if (!commandsThatDontRequireData.Contains(userEntry.Command))
-                    {
-                        userEntry.Data = ReturnsData(input);
-                    }
-                }
-            }
-            return userEntry;
-        }
-
-
-        public string[] ReadUserInput(string userInput)
-        {
-            var splitArray = userInput.Split();
+            var splitArray = userInput.ToUpper().Split(' ');
 
             var removedEmptyArrays = splitArray.Where(x => !string.IsNullOrWhiteSpace(x));
             var trimmedArray = removedEmptyArrays.ToArray();
             return trimmedArray;
         }
 
-        public string CallCommand (string[] userInput)
+        public bool CheckIfUserInputValid(string[] userInput)
         {
-                return userInput[0];
+            bool checkIfCommandExist = allCommands.Contains(userInput[0]);
+            int checkIfQueryCount = userInput.Count() - 1;
+            int[] exceptedQueryCount = { 3, 2};
 
+            if (checkIfCommandExist.Equals(true))
+            {
 
-           
+                if (exceptedQueryCount.Contains(checkIfQueryCount))
+                {
+                    bool isIndexValid = checkIfIndexValid(userInput);
+                    bool isTimeStampValid = checkIfTimeStampValid(userInput);
+
+                    if (isIndexValid == true && isTimeStampValid == true)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return checkIfIndexValid(userInput);
+                }
+            }
+            else
+            {
+                Console.WriteLine("ERR Command is invalid");
+                return false;
+            }
         }
 
-        public int ReturnsIndex(string[] userInput)
+        public void ExecuteUserInput(string input)
         {
-              
-            bool canConvert = false;
-            int index;
+            var userInput = ProcessUserInput(input);
 
-            if (userInput.Count() < 2)
+
+            if (CheckIfUserInputValid(userInput).Equals(true))
             {
-                canConvert = Int32.TryParse(userInput[1], out index);
+                switch (userInput.Count())
+                {
+                    case 4:
+                        this.Command = userInput[0];
+                        SetIndex(userInput);
+                        SetTimeStamp(userInput);
+                        SetData(userInput);
+                        break;
+                    case 3:
+                        this.Command = userInput[0];
+                        SetIndex(userInput);
+                        SetTimeStamp(userInput);
+                        break;
+                    case 2:
+                        this.Command = userInput[0];
+                        SetIndex(userInput);
+                        break;
+                    default:
+                        this.Command = userInput[0];
+                        break;
+                }
+
+            }
+        }
+
+        public bool checkIfIndexValid(string[] userInput)
+        {
+            bool validIntForID = int.TryParse(userInput[1], out int i);
+
+            if (validIntForID.Equals(true))
+            {
+                    return true;
                 
-            }else { 
-                Console.WriteLine("ERR Invalid index input. Must be an int");
             }
-            return 0;
-
-        }
-        
-
-        public int ReturnsTimeStamp(string[] userInput)
-        {   
-            bool canConvert = false;
-
-            canConvert = Int32.TryParse(userInput[2], out int timeStamp);
-
-            if (canConvert.Equals(false))
-            {
-                Console.WriteLine("Invalid index input. Must be an int");
-            }
-
-            return timeStamp;
+ 
+            Console.WriteLine("ERR Invalid index. Must be a int");
+            return false;
+            
         }
 
-        public string ReturnsData(string[] userInput)
+        public bool checkIfTimeStampValid(string[] userInput)
         {
 
-            return userInput[3];
+            bool validforTimeStamp = long.TryParse(userInput[2], out long i);
+
+                if (validforTimeStamp.Equals(true))
+                {
+                    return true;
+
+                }
+
+                    Console.WriteLine("ERR Invalid TimeStamp. Must be a long");
+                    return false;
+        }
+
+        public void SetIndex(string[] userInput)
+        {
+            Int32.TryParse(userInput[1], out int i);
+
+            this.Index = i;           
+        }
+
+        public void SetTimeStamp(string[] userInput)
+        {
+
+            long.TryParse(userInput[2], out long timeStamp);
+
+            this.TimeStamp = timeStamp;
+        }
+
+        public void SetData(string[] data)
+        {
+            this.Data = data[3];
         }
 
     }
