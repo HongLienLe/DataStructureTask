@@ -8,11 +8,9 @@ namespace DataStructureTask
     {
         static Dictionary<int, List<Observation>> historyOfObservation;
 
-        IReadUserEntry userEntry;
 
-        public History(IReadUserEntry userEntry)
+        public History()
         {
-            this.userEntry = userEntry;
             historyOfObservation = new Dictionary<int, List<Observation>>();
         }
 
@@ -22,16 +20,17 @@ namespace DataStructureTask
             return historyOfObservation;
         }
 
-        public void Create(int id, int timeStamp, string data)
-        { 
 
+        public void Create(int id,long timeStamp, string data)
+        {
 
-            List<Observation> newList = new List<Observation>();
             if (!DoesKeyExist(id))
             {
-                var firstOb = new Observation(timeStamp, data);
 
-                newList.Add(firstOb);
+                List<Observation> newList = new List<Observation>() {
+                    new Observation(timeStamp, data)
+                };
+
 
                 historyOfObservation.Add(id, newList);
 
@@ -44,7 +43,7 @@ namespace DataStructureTask
 
         }
 
-        public void Update(int id, int timeStamp, string data)
+        public void Update(int id,long timeStamp, string data)
         {
 
             if (!DoesKeyAndTimeExist(id,timeStamp))
@@ -69,21 +68,10 @@ namespace DataStructureTask
             }
         }
 
-        public void Delete(int id)
+        public void Delete(int id, long timeStamp)
         {
-
-            if (DoesKeyExist(id))
-            {
-
-                historyOfObservation.Remove(id);
-            }
-
             
-        }
-
-        public void Delete(int id, int timeStamp)
-        {
-            if (DoesKeyAndTimeExist(id, timeStamp))
+            if (DoesKeyAndTimeExist(id, timeStamp) == true)
             {
                 var findIndex = historyOfObservation[id].FindIndex(x => x.TimeStamp.Equals(timeStamp));
                 int range = historyOfObservation[id].Count() - findIndex;
@@ -91,6 +79,7 @@ namespace DataStructureTask
 
                 historyOfObservation[id].RemoveRange(findIndex, range);
             }
+
 
             if (historyOfObservation[id].Count() >= 0)
             {
@@ -108,17 +97,25 @@ namespace DataStructureTask
 
         }
 
-        public void Get(int id, int timeStamp)
+        public void Delete(int id)
         {
+            if (DoesKeyExist(id) == true)
+            {
+                historyOfObservation.Remove(id);
+            }
 
+        }
+
+        public void Get(int id, long timeStamp)
+        {
             if (DoesKeyExist(id))
             {
                 
                 var range = historyOfObservation[id].Select(x => x.TimeStamp.CompareTo(timeStamp)).ToList();
 
-                int min = range.Min();
+                var max = range.Max();
 
-                var index = range.FindIndex(x => x.Equals(min));
+                var index = range.FindIndex(x => x.Equals(max));
 
                 var list = historyOfObservation[id];
                 var ob = list[index];
@@ -134,7 +131,6 @@ namespace DataStructureTask
 
         public void Latest(int id)
         {
-
             if (DoesKeyExist(id))
             {
                 var list = historyOfObservation[id];
@@ -155,9 +151,9 @@ namespace DataStructureTask
             return historyOfObservation.ContainsKey(index);
         }
 
-        public bool DoesTimeStampExist(List<Observation> observationlist, int timeStamp)
+        public bool DoesTimeStampExist(int id, long timeStamp)
         {
-            foreach (var ob in observationlist)
+            foreach (var ob in historyOfObservation[id])
             {
                 if (ob.TimeStamp.Equals(timeStamp))
                 {
@@ -172,11 +168,11 @@ namespace DataStructureTask
             Console.WriteLine($"OK {data}");
         }
 
-        public bool DoesKeyAndTimeExist(int id, int timeStamp)
+        public bool DoesKeyAndTimeExist(int id, long timeStamp)
         {
             if (DoesKeyExist(id))
             {
-                if (DoesTimeStampExist(historyOfObservation[id], timeStamp))
+                if (DoesTimeStampExist(id, timeStamp))
                 {
                     return true;
                 }

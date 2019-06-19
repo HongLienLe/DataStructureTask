@@ -13,6 +13,14 @@ namespace DataStructureTask
         public string Data { get; set; }
         string[] allCommands = { "GET", "LATEST", "DELETE", "QUIT", "CREATE", "UPDATE" };
 
+        IHistory history;
+
+        public ReadUserEntry(IHistory history)
+        {
+            this.history = history;
+        }
+
+
         public string[] ProcessUserInput(string userInput)
         {
             var splitArray = userInput.ToUpper().Split(' ');
@@ -57,7 +65,7 @@ namespace DataStructureTask
             }
         }
 
-        public void ExecuteUserInput(string input)
+        public void ProcessInput(string input)
         {
             var userInput = ProcessUserInput(input);
 
@@ -87,6 +95,34 @@ namespace DataStructureTask
                 }
 
             }
+
+        }
+
+        public void ExecuteInput(string command)
+        {
+            switch (command)
+            {
+                case "CREATE":
+                    history.Create(Index, TimeStamp, Data);
+                    break;
+                case "UPDATE":
+                    history.Update(Index, TimeStamp, Data);
+                    break;
+                case "GET":
+                    history.Get(Index, TimeStamp);
+                    break;
+                case "LATEST":
+                    history.Latest(Index);
+                    break;
+                case "DELETE":
+                    history.Delete(Index);
+
+                    break;
+                case "QUIT":
+                    break;
+            }
+
+
         }
 
         public bool checkIfIndexValid(string[] userInput)

@@ -16,7 +16,11 @@ namespace DataStructureTask
             var readUser = container.Resolve<IReadUserEntry>();
             var history = container.Resolve<IHistory>();
 
-           
+            history.Create(0, 10, "10");
+            history.Update(0, 15, "TestingUpdated");
+            history.Update(0, 20, "Come on work");
+
+            history.Get(0, 18);
 
 
         }

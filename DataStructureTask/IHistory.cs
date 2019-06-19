@@ -5,11 +5,11 @@ namespace DataStructureTask
     public interface IHistory
     {
         Dictionary<int, List<Observation>> GetHistoryOfObservationData();
-        void Create(int id, int timeStamp, string data);
-        void Update(int id, int timeStamp, string data);
+        void Create(int id,long timeStamp, string data);
+        void Update(int id, long timeStamp, string data);
+        void Delete(int id, long timeStamp);
         void Delete(int id);
-        void Delete(int id, int timeStamp);
-        void Get(int id, int timeStamp);
+        void Get(int id, long timeStamp);
         void Latest(int id);
     }
 }
