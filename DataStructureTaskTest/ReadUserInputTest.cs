@@ -1,77 +1,77 @@
-﻿//using System;
-//using NUnit.Framework;
-//using DataStructureTask;
+﻿using System;
+using Moq;
+using NUnit.Framework;
+using DataStructureTask;
 
-//namespace DataStructureTaskTest
-//{
-//    public class ReadUserInputTest
-//    {
-//        ReadUserEntry _ReadUserTest;
+namespace DataStructureTaskTest
+{
+    public class ReadUserInputTest
+    {
+        ReadUserEntry _ReadUserTest;
 
-//        [SetUp]
-//        public void SetUp()
-//        {
-//            _ReadUserTest = new ReadUserEntry();
-//        }
+        [SetUp]
+        public void SetUp()
+        {
+            var mock = new Mock<IHistory>();
+            _ReadUserTest = new ReadUserEntry(mock.Object);
 
-//        [Test]
-//        public void CanReadUserInput()
-//        {
-//            string testInput = "CREATE 0 12 TESTING  ";
-//            var result = _ReadUserTest.ProcessUserInput(testInput);
+        }
 
-//            string[] expected = { "CREATE", "0", "12", "TESTING" };
+        [Test]
+        public void CanReadUserInput()
+        {
+            string testInput = "CREATE 0 12 TESTING  ";
+            var result = _ReadUserTest.ReadingInput(testInput);
 
-//            Assert.AreEqual(expected, result);
-//        }
-//        [Test]
-//        public void CanTellWhenCommandNotValid()
-//        {
-//            string testInput = "ThrowExcpetion 0 12 TESTING";
+            string[] expected = { "CREATE", "0", "12", "TESTING" };
 
-//            _ReadUserTest.ExecuteUserInput(testInput);
+            Assert.AreEqual(expected, result);
+        }
+        [Test]
+        public void CanTellWhenCommandNotValid()
+        {
+            string testInput = "ThrowExcpetion 0 12 TESTING";
 
-//        }
-//        [Test]
-//        public void CanTellIfIndexNotValid()
-//        {
-//            string[] testInput = { "CREATE", "Invalid", "12", "TESTING" };
+            _ReadUserTest.ProcessInput(testInput);
 
-//            _ReadUserTest.checkIfIndexValid(testInput);
-//        }
-//        [Test]
-//        public void CanTellIfTimeStampInvalid()
-//        {
-//            string[] testInput = { "CREATE", "0", "Invalid", "TESTING" };
+        }
+        [Test]
+        public void CanTellIfIndexNotValid()
+        {
+            string[] testInput = { "CREATE", "Invalid", "12", "TESTING" };
 
-//            _ReadUserTest.checkIfTimeStampValid(testInput);
+            _ReadUserTest.checkIfIndexValid(testInput);
+        }
+        [Test]
+        public void CanTellIfTimeStampInvalid()
+        {
+            string[] testInput = { "CREATE", "0", "Invalid", "TESTING" };
 
-//        }
+            _ReadUserTest.checkIfTimeStampValid(testInput);
 
-//        [Test]
-//        public void checkIfTheValidationWorks()
-//        {
-//            string[] testTimeStamp = { "CREATE", "0", "Invalid", "TESTING" };
-//            string[] testIVCommand = {"Invalid" };
-//            string[] testIVId = {"CREATE", "Invalid" };
+        }
 
-
-//            bool resultCommand = _ReadUserTest.CheckIfUserInputValid(testIVCommand);
-//            bool resultID = _ReadUserTest.CheckIfUserInputValid(testIVId);
-//            bool resultTimeStamp = _ReadUserTest.CheckIfUserInputValid(testTimeStamp);
-
-//            Assert.AreEqual(false, resultCommand);
-//            Assert.AreEqual(false, resultID);
-//            Assert.AreEqual(false, resultTimeStamp);
-
-//        }
-
-//        [Test]
-//        public void CanSetCorrectFields()
-//        {
-            
-//        }
+        [Test]
+        public void checkIfTheValidationWorks()
+        {
+            string testTimeStamp = "CREATE 0 Invalid TESTING";
+            string testIVCommand = "Invalid" ;
+            string testIVId ="CREATE Invalid";
 
 
-//    }
-//}
+             _ReadUserTest.ProcessInput(testIVCommand);
+            _ReadUserTest.ProcessInput(testIVId);
+             _ReadUserTest.ProcessInput(testTimeStamp);
+
+
+        }
+
+        [Test]
+        public void CanSetCorrectFields()
+        {
+
+        }
+
+
+    }
+}

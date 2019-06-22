@@ -15,4 +15,9 @@
     <Compile Remove="ExecuteUserInput.cs" />
     <Compile Remove="IExecuteUserInput.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Update="LoadTestEntry.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
 </Project>

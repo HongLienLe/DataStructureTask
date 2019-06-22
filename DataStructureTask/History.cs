@@ -45,27 +45,22 @@ namespace DataStructureTask
 
         public void Update(int id,long timeStamp, string data)
         {
-
             if (!DoesKeyAndTimeExist(id,timeStamp))
                 {
                     var newob = new Observation(timeStamp, data);
                     historyOfObservation[id].Add(newob);
-                  
+                    var priorob = historyOfObservation[id].ElementAt(historyOfObservation[id].Count() - 2);
+                    PrintOkData(priorob.Data);
                 }
-                else
+                else if(DoesKeyExist(id))
                 {
-                Console.WriteLine("ERR TimeStamp for this index exist");
+                    var i = historyOfObservation[id].FindIndex(x => x.TimeStamp.Equals(timeStamp));
+                    historyOfObservation[id][i].TimeStamp = timeStamp;
+
+                    PrintOkData(historyOfObservation[id][i].Data);
+                    historyOfObservation[id][i].Data = data;
                 }
 
-
-            if(historyOfObservation[id].Count() > 0)
-            {
-                int priorId = id - 0;
-                var list = historyOfObservation[priorId];
-                var ob = list.Last();
-
-                PrintOkData(ob.Data);
-            }
         }
 
         public void Delete(int id, long timeStamp)
@@ -75,24 +70,18 @@ namespace DataStructureTask
             {
                 var findIndex = historyOfObservation[id].FindIndex(x => x.TimeStamp.Equals(timeStamp));
                 int range = historyOfObservation[id].Count() - findIndex;
-
-
                 historyOfObservation[id].RemoveRange(findIndex, range);
             }
 
-
-            if (historyOfObservation[id].Count() >= 0)
-            {
-                var maxTimeStamp = historyOfObservation[id].Max(x => x.TimeStamp);
-
-                var ob = historyOfObservation[id].Where(x => x.TimeStamp.Equals(maxTimeStamp)).ToArray();
-
-                Console.WriteLine($"OK {ob[0].TimeStamp} {ob[0].Data}");
-
-            }
-            else
+             if (historyOfObservation[id].Count() == 0)
             {
                 Console.WriteLine("ERR There is no avaliable observations");
+            } else
+            {
+                var obMaxTimeStamp = historyOfObservation[id].Max(x => x.TimeStamp);
+                var ob = historyOfObservation[id].Where(x => x.TimeStamp.Equals(obMaxTimeStamp)).ToArray();
+                PrintOkData(ob[0].Data);
+
             }
 
         }
@@ -101,7 +90,13 @@ namespace DataStructureTask
         {
             if (DoesKeyExist(id) == true)
             {
+
+                var obMaxTimeStamp = historyOfObservation[id].Max(x => x.TimeStamp);
+                var ob = historyOfObservation[id].Where(x => x.TimeStamp.Equals(obMaxTimeStamp)).ToArray();
+                PrintOkData(ob[0].Data);
+
                 historyOfObservation.Remove(id);
+
             }
 
         }
@@ -110,18 +105,23 @@ namespace DataStructureTask
         {
             if (DoesKeyExist(id))
             {
-                
-                var range = historyOfObservation[id].Select(x => x.TimeStamp.CompareTo(timeStamp)).ToList();
+                if (DoesTimeStampExist(id, timeStamp))
+                {
+                    var findOb = historyOfObservation[id].Where(x => x.TimeStamp.Equals(timeStamp)).ToArray();
+                    PrintOkData(findOb[0].Data);
+                }
+                else
+                {
+                    var range = historyOfObservation[id].Select(x => Math.Abs(x.TimeStamp - timeStamp)).ToList();
+                    var minValue = range.Min();
 
-                var max = range.Max();
+                    var i = range.FindIndex(x => x.Equals(minValue));
 
-                var index = range.FindIndex(x => x.Equals(max));
+                    var oblist = historyOfObservation[id];
+                    var ob = oblist[i];
 
-                var list = historyOfObservation[id];
-                var ob = list[index];
-
-                Console.WriteLine($"OK {ob.Data}");
-
+                    PrintOkData(ob.Data);
+                }
 
             } else
             {

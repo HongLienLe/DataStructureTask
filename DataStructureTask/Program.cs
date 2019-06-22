@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using Castle.Windsor;
 using Castle.MicroKernel.Registration;
+using System.Collections.Generic;
 
 namespace DataStructureTask
 {
@@ -16,13 +18,35 @@ namespace DataStructureTask
             var readUser = container.Resolve<IReadUserEntry>();
             var history = container.Resolve<IHistory>();
 
-            history.Create(0, 10, "10");
-            history.Update(0, 15, "TestingUpdated");
-            history.Update(0, 20, "Come on work");
+            string path = "/Users/hongle/Projects/DataStructureTask/DataStructureTask/TestEntry.txt";
 
-            history.Get(0, 18);
+ 
+                FileInfo file = new FileInfo(path);
+                List<string> lines = new List<string>();
+                string line;
+                using (var reader = new StreamReader(file.FullName))
+                {
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        lines.Add(line);
+                    }
+                }
+
+                foreach ( var query in lines)
+                  {
+                    Console.WriteLine(query);
+                    readUser.ProcessInput(query);
+                  }
 
 
+
+
+            //    while (readUser.Quit == 0)
+            //{
+            //    string userInput = Console.ReadLine();
+            //    readUser.ProcessInput(userInput);
+
+            //}
         }
     }
 }
