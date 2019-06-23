@@ -88,7 +88,7 @@ namespace Tests
 
             test.Delete(0, 10);
 
-            var result = test.DoesTimeStampExist(0, 10);
+            var result = test.DoesKeyAndTimeExist(0, 10);
 
             Assert.AreEqual(false, result);
         }

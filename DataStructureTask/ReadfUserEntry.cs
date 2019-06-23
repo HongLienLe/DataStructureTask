@@ -21,159 +21,98 @@ namespace DataStructureTask
             this.history = history;
         }
 
-
-        public string[] ReadingInput(string userInput)
+        public string[] ReadingStringInput(string userInput)
         {
             var splitArray = userInput.ToUpper().Split(' ');
-
-            var removedEmptyArrays = splitArray.Where(x => !string.IsNullOrWhiteSpace(x));
-            var trimmedArray = removedEmptyArrays.ToArray();
-
-            return trimmedArray;
-
-             
-            
+            var cleanArray = splitArray.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+            return cleanArray;
         }
 
         public void ProcessInput(string input)
         {
-           var userInput = ReadingInput(input);
+            var userInput = ReadingStringInput(input);
 
-            if (allCommands.Contains(userInput[0]).Equals(true) && !userInput.Count().Equals(0))
+            if (allCommands.Contains(userInput[0]) && !userInput.Count().Equals(0))
             {
                 switch (userInput[0])
                 {
                     case "CREATE":
-                        if(!isValidInput(userInput, 4).Equals(true))
-                        {
-                            Console.WriteLine("ERR Query is in Invalid Format");
-
-                        } else
+                        if (IsValidInput(userInput,4))
                         {
                             SetProperties(userInput);
-                            CallCommand(Command);
+                            history.Create(Index, TimeStamp, Data);
                         }
 
                         break;
                     case "UPDATE":
-                        if (!isValidInput(userInput, 4).Equals(true))
-                        {
-                            Console.WriteLine("ERR Query is in Invalid Format");
-
-                        }
-                        else
+                        if (IsValidInput(userInput,4))
                         {
                             SetProperties(userInput);
-                            CallCommand(Command);
+                            history.Update(Index, TimeStamp, Data);
                         }
                         break;
                     case "GET":
-                        if (!isValidInput(userInput, 3).Equals(true))
-                        {
-                            Console.WriteLine("ERR Query is in Invalid Format");
-                        }
-                        else
+                        if (IsValidInput(userInput,3))
                         {
                             SetProperties(userInput);
-                            CallCommand(Command);
+                            history.Get(Index, TimeStamp);
                         }
                         break;
                     case "LATEST":
-                        if (!isValidInput(userInput, 2).Equals(true))
-                        {
-                            Console.WriteLine("ERR Query is in Invalid Format");
-                        }
-                        else
+                        if (IsValidInput(userInput,2))
                         {
                             SetProperties(userInput);
-                            CallCommand(Command);
+                            history.Latest(Index);
                         }
                         break;
                     case "DELETE":
-                        if (!isValidInput(userInput, 3).Equals(true) && !isValidInput(userInput, 2).Equals(true))
+                        if (userInput.Count().Equals(3))
                         {
-                            Console.WriteLine("ERR Query is in Invalid Format");
-
-                        }
-                        else
-                        {
+                            if (IsValidInput(userInput, 3)) { 
                             SetProperties(userInput);
-                            CallCommand(Command);
+                            history.Delete(Index, TimeStamp);
+                        }
+                        } else if (userInput.Count().Equals(2))
+                        {
+                            if (IsValidInput(userInput, 2))
+                            {
+                                SetProperties(userInput);
+                                history.Delete(Index);
+                            }
                         }
                         break;
                     case "QUIT":
                         Quit += 1;
-                    break;
+                        break;
                 }
             }
             else
             {
-                Console.WriteLine("ERR Command is invalid");
+                Console.WriteLine("ERR Command is invalid.");
             }
         }
 
-        public void CallCommand(string command)
+        public bool IsIndexValid(string[] userInput)
         {
-            switch (command)
+            if (!int.TryParse(userInput[1], out int i))
             {
-                case "CREATE":
-                    history.Create(Index, TimeStamp, Data);
-                    break;
-                case "UPDATE":
-                    history.Update(Index, TimeStamp, Data);
-                    break;
-                case "GET":
-                    history.Get(Index, TimeStamp);
-                    break;
-                case "LATEST":
-                    history.Latest(Index);
-                    break;
-                case "DELETE":
-                    history.Delete(Index, TimeStamp);
-                    break;
-                case "QUIT":
-                    Quit += 1;
-                    break;
+                Console.WriteLine("ERR Invalid index. Must be a int.");
             }
+            return true ;
         }
 
-        public bool checkIfIndexValid(string[] userInput)
+        public bool IsTimeStampValid(string[] userInput)
         {
-            if (userInput.Count() >= 2)
+            if (!long.TryParse(userInput[2], out long i))
             {
-                bool validIntForID = int.TryParse(userInput[1], out int i);
 
-                if (validIntForID.Equals(true))
-                {
-                    return true;
-
-                }
-                Console.WriteLine("ERR Invalid index. Must be a int");
+                Console.WriteLine("ERR Invalid TimeStamp. Must be a long.");
             }
-            return false;
-
-            
-        }
-
-        public bool checkIfTimeStampValid(string[] userInput)
-        {
-            if(userInput.Count() >= 3)
-            {
-                bool validforTimeStamp = long.TryParse(userInput[2], out long i);
-
-                if (validforTimeStamp.Equals(true))
-                {
-                    return true;
-
-                }
-            }
-                    Console.WriteLine("ERR Invalid TimeStamp. Must be a long");
-                    return false;
+            return true;
         }
 
         public void SetProperties(string[] userInput)
         {
-
             int count = userInput.Count();
             switch (count)
             {
@@ -202,16 +141,25 @@ namespace DataStructureTask
                     break;
             }
         }
-        public bool isValidInput(string[] userInput, int count)
+        public bool IsValidInput(string[] userInput, int count)
         {
+            bool val = false;
+
             if (count <= 2)
             {
-                return checkIfIndexValid(userInput) && userInput.Count().Equals(2);
+                val = IsIndexValid(userInput) && userInput.Count().Equals(2);
             }
-            else
+            else if (count > 2 && count <= 4 )
             {
-                return userInput.Count() == count && checkIfIndexValid(userInput) && checkIfTimeStampValid(userInput);
+                val = userInput.Count() == count && IsIndexValid(userInput) && IsTimeStampValid(userInput);
             }
+
+            if (!val)
+            {
+                Console.WriteLine("ERR Invalid query format.");
+            }
+            return val;
         }
     }
 }
+

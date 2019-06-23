@@ -21,7 +21,7 @@ namespace DataStructureTaskTest
         public void CanReadUserInput()
         {
             string testInput = "CREATE 0 12 TESTING  ";
-            var result = _ReadUserTest.ReadingInput(testInput);
+            var result = _ReadUserTest.ReadingStringInput(testInput);
 
             string[] expected = { "CREATE", "0", "12", "TESTING" };
 
@@ -40,14 +40,14 @@ namespace DataStructureTaskTest
         {
             string[] testInput = { "CREATE", "Invalid", "12", "TESTING" };
 
-            _ReadUserTest.checkIfIndexValid(testInput);
+            _ReadUserTest.IsIndexValid(testInput);
         }
         [Test]
         public void CanTellIfTimeStampInvalid()
         {
             string[] testInput = { "CREATE", "0", "Invalid", "TESTING" };
 
-            _ReadUserTest.checkIfTimeStampValid(testInput);
+            _ReadUserTest.IsTimeStampValid(testInput);
 
         }
 

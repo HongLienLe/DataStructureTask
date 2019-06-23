@@ -16,37 +16,36 @@ namespace DataStructureTask
             container.Register(Component.For<IHistory>().ImplementedBy<History>());
 
             var readUser = container.Resolve<IReadUserEntry>();
-            var history = container.Resolve<IHistory>();
 
             string path = "/Users/hongle/Projects/DataStructureTask/DataStructureTask/TestEntry.txt";
 
- 
-                FileInfo file = new FileInfo(path);
-                List<string> lines = new List<string>();
-                string line;
-                using (var reader = new StreamReader(file.FullName))
+
+            FileInfo file = new FileInfo(path);
+            List<string> lines = new List<string>();
+            string line;
+            using (var reader = new StreamReader(file.FullName))
+            {
+                while ((line = reader.ReadLine()) != null)
                 {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        lines.Add(line);
-                    }
+                    lines.Add(line);
                 }
+            }
 
-                foreach ( var query in lines)
-                  {
-                    Console.WriteLine(query);
-                    readUser.ProcessInput(query);
-                  }
+            foreach (var query in lines)
+            {
+                Console.WriteLine(query);
+                readUser.ProcessInput(query);
+            }
 
 
 
 
-            //    while (readUser.Quit == 0)
-            //{
-            //    string userInput = Console.ReadLine();
-            //    readUser.ProcessInput(userInput);
+            while (readUser.Quit == 0)
+            {
+                string userInput = Console.ReadLine();
+                readUser.ProcessInput(userInput);
 
-            //}
+            }
         }
     }
 }
