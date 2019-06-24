@@ -3,6 +3,7 @@ using System.IO;
 using Castle.Windsor;
 using Castle.MicroKernel.Registration;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DataStructureTask
 {
@@ -15,21 +16,13 @@ namespace DataStructureTask
             container.Register(Component.For<IReadUserEntry>().ImplementedBy<ReadUserEntry>());
             container.Register(Component.For<IHistory>().ImplementedBy<History>());
 
+            var history = container.Resolve<IHistory>();
             var readUser = container.Resolve<IReadUserEntry>();
+            
 
             string path = "/Users/hongle/Projects/DataStructureTask/DataStructureTask/TestEntry.txt";
-
-
             FileInfo file = new FileInfo(path);
-            List<string> lines = new List<string>();
-            string line;
-            using (var reader = new StreamReader(file.FullName))
-            {
-                while ((line = reader.ReadLine()) != null)
-                {
-                    lines.Add(line);
-                }
-            }
+            var lines = File.ReadAllLines(path).ToList();
 
             foreach (var query in lines)
             {
@@ -37,15 +30,20 @@ namespace DataStructureTask
                 readUser.ProcessInput(query);
             }
 
+           var i =  history.GetHistoryOfObservationData();
 
 
 
-            while (readUser.Quit == 0)
-            {
-                string userInput = Console.ReadLine();
-                readUser.ProcessInput(userInput);
 
-            }
+
+
+
+            //while (readUser.Quit == 0)
+            //{
+            //    string userInput = Console.ReadLine();
+            //    readUser.ProcessInput(userInput);
+
+            //}
         }
     }
 }

@@ -19,5 +19,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ExecuteUserInputTest.cs" />
+    <Compile Remove="HistoryTest.cs" />
   </ItemGroup>
 </Project>

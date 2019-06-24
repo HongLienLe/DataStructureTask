@@ -1,13 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace DataStructureTask
 {
     public interface IReadUserEntry
     {
-        void ProcessInput(string userInput);
-        string Command { get; set; }
-        int Index { get; set; }
-        long TimeStamp { get; set; }
-        string Data { get; set; }
+        Dictionary<int, List<Observation>> ProcessInput(string userInput);
         int Quit { get; set; }
     }
 }

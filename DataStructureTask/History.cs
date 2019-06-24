@@ -20,7 +20,7 @@ namespace DataStructureTask
 
         public void Create(int id,long timeStamp, string data)
         {
-            if (!DoesKeyExist(id))
+            if (!historyOfObservation.ContainsKey(id))
             {
                 historyOfObservation.Add(id, new List<Observation>() {new Observation(timeStamp, data)});
                 PrintData(data);
@@ -40,7 +40,7 @@ namespace DataStructureTask
                     var priorob = historyOfObservation[id].ElementAt(historyOfObservation[id].Count() - 2);
                     PrintData(priorob.Data);
                 }
-                else if(DoesKeyExist(id))
+                else if(historyOfObservation.ContainsKey(id))
                 {
                     FindObservation(id, timeStamp).TimeStamp = timeStamp;
                     PrintData(FindObservation(id, timeStamp).Data);
@@ -50,26 +50,22 @@ namespace DataStructureTask
 
         public void Delete(int id, long timeStamp)
         {
-            if (DoesKeyAndTimeExist(id, timeStamp))
+            if (historyOfObservation.ContainsKey(id))
             {
-                var findIndex = historyOfObservation[id].FindIndex(x => x.TimeStamp.Equals(timeStamp));
+                Get(id, timeStamp);
+                var compareTo = historyOfObservation[id].Select(x => x.TimeStamp.CompareTo(timeStamp)).ToList();
+                var findIndex = compareTo.FindIndex(x => x >= 0);
                 int range = historyOfObservation[id].Count() - findIndex;
                 historyOfObservation[id].RemoveRange(findIndex, range);
-            }
+            } else {
 
-             if (historyOfObservation[id].Count() == 0)
-            {
                 Console.WriteLine("ERR There is no avaliable observations");
-            } else
-            {
-                var ob = FindObservation(id, MaxTimeStamp(id));
-                PrintData(ob.Data);
             }
         }
 
         public void Delete(int id)
         {
-            if (!DoesKeyExist(id))
+            if (!historyOfObservation.ContainsKey(id))
             {
                 PrintErrorMsgNoHistoryExist(id);
             } else{
@@ -81,7 +77,7 @@ namespace DataStructureTask
 
         public void Get(int id, long timeStamp)
         {
-            if (!DoesKeyExist(id))
+            if (!historyOfObservation.ContainsKey(id))
             {
                 PrintErrorMsgNoHistoryExist(id);
             } else {
@@ -95,18 +91,13 @@ namespace DataStructureTask
 
         public void Latest(int id)
         {
-            if (!DoesKeyExist(id))
+            if (!historyOfObservation.ContainsKey(id))
             {
                 PrintErrorMsgNoHistoryExist(id);
             } else {
                 var ob = FindObservation(id, MaxTimeStamp(id));
                 Console.WriteLine($"OK {ob.TimeStamp} {ob.Data}");
             }
-        }
-
-        public bool DoesKeyExist(int id)
-        {
-            return historyOfObservation.ContainsKey(id);
         }
 
         public void PrintErrorMsgNoHistoryExist(int id)
@@ -121,7 +112,7 @@ namespace DataStructureTask
 
         public bool DoesKeyAndTimeExist(int id, long timeStamp)
         {
-            return historyOfObservation[id].Any(x => x.TimeStamp.Equals(timeStamp)) && DoesKeyExist(id);
+            return historyOfObservation[id].Any(x => x.TimeStamp.Equals(timeStamp)) && historyOfObservation.ContainsKey(id);
         }
 
         public Observation FindObservation(int id, long timeStamp)
