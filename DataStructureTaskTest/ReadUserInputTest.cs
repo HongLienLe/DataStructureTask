@@ -3,49 +3,86 @@ using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using DataStructureTask;
+using System.IO;
+using System.Linq;
 
 namespace DataStructureTaskTest
 {
     public class ReadUserInputTest
     {
         ReadUserEntry _ReadUserTest;
+        History _history;
 
         [SetUp]
         public void SetUp()
         {
-            _ReadUserTest = new ReadUserEntry(SetUpIHistoryMock());
+             _history = new History();
+            _ReadUserTest = new ReadUserEntry(_history);
         }
-        public void create_new_entry_in_dic_return_true()
-        {
-            string expectedData = "test";
-            var dic = _ReadUserTest.ProcessInput("CREATE 0 0 test");
-            var resultData = dic[0][1].Data;
-            Assert.AreEqual(expectedData, resultData);
-        }
+
         [Test]
-        public void cant_create_new_entry_that_already_exist_return_false()
+        public void FullRunThrough()
         {
-            string expectedData = "test";
-            var dic = _ReadUserTest.ProcessInput("CREATE 1 10 test");
-            var resultData = dic[0][1].Data;
-            Assert.AreEqual(expectedData, resultData);
+            string path = "/Users/hongle/Projects/DataStructureTask/DataStructureTask/TestEntry.txt";
+            var lines = File.ReadAllLines(path).ToList();
+
+            foreach (var query in lines)
+            {
+                Console.WriteLine(query);
+                var x = _ReadUserTest.ProcessInput(query);
+                Console.WriteLine(x);
+            }
 
         }
-        public IHistory SetUpIHistoryMock()
-        {
-            Dictionary<int, List<Observation>> testDic = new Dictionary<int, List<Observation>>()
-            {   {1, new List<Observation>(){new Observation(10, "test10"),
-                                            new Observation(11, "test11"),
-                                            new Observation(12, "test12"),
-                                            new Observation(13, "test13"),}},
-                {2, new List<Observation>(){new Observation(20, "test20"),
-                                            new Observation(21, "test21"),
-                                            new Observation(22, "test22"),
-                                            new Observation(23, "test23")}}};
-            var mock = new Mock<IHistory>();
-            mock.Setup(x => x.GetHistoryOfObservationData()).Returns(testDic);
 
-            return mock.Object;
+        [Test]
+        public void given_input_valid_incorrect_format_then_return_ERRMessage()
+        {
+            string testIput = "UPDATE 1  4  TEST";
+            var value = _ReadUserTest.ProcessInput(testIput);
+
+            Assert.AreEqual("ERR A history already exists for identifier 1", value);
+        }
+
+        [Test]
+        public void given_input_valid_in_wrong_format_return_false()
+        {
+            string[] array = { "1", "CREATE", "4", "TEST" };
+
+            Assert.IsFalse(_ReadUserTest.IsValidInput(array));
+        }
+
+        [Test]
+        public void given_index_valid_then_return_false()
+        {
+            string[] array = { "CREATE", "INVALID", "4", "TEST" };
+            Assert.IsFalse(_ReadUserTest.IsIndexValid(array));
+        }
+
+        [Test]
+        public void when_given_index_is_valid_return_true()
+        {
+            string[] array = { "UPDATE", "1", "1", "TEST" };
+        
+            Assert.IsTrue(_ReadUserTest.IsIndexValid(array));
+
+        }
+
+        [Test]
+        public void when_given_timestamp_is_valid_return_true()
+        {
+            string[] array = { "UPDATE", "1", "1", "TEST" };
+
+            Assert.IsTrue(_ReadUserTest.IsTimeStampValid(array));
+
+        }
+
+        [Test]
+        public void given_invalid_index_then_return_false()
+        {
+            string[] array = { "UPDATE", "INVALID", "1", "TEST" };
+  
+            Assert.IsFalse(_ReadUserTest.IsIndexValid(array));
         }
     }
 }

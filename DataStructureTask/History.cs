@@ -6,8 +6,7 @@ namespace DataStructureTask
 {
     public class History : IHistory
     {
-        static Dictionary<int, List<Observation>> historyOfObservation;
-
+       static Dictionary<int, List<Observation>> historyOfObservation;
         public History()
         {
             historyOfObservation = new Dictionary<int, List<Observation>>();
@@ -18,113 +17,100 @@ namespace DataStructureTask
             return historyOfObservation;
         }
 
-        public void Create(int id,long timeStamp, string data)
+        public string Create(int id, long timeStamp, string data)
+        {
+            if (!historyOfObservation.ContainsKey(id)) {
+                
+                historyOfObservation.Add(id, new List<Observation>() { new Observation(timeStamp, data) });
+                return data;
+            }
+            return ErrMessageNoHistoryExist(id);
+        }
+
+        public string Update(int id, long timeStamp, string data)
         {
             if (!historyOfObservation.ContainsKey(id))
             {
-                historyOfObservation.Add(id, new List<Observation>() {new Observation(timeStamp, data)});
-                PrintData(data);
+                return ErrMessageNoHistoryExist(id);
             }
-            else
+            else if (historyOfObservation.ContainsKey(id) && historyOfObservation[id].Any(x => timeStamp.Equals(x.TimeStamp)))
             {
-                Console.WriteLine($"ERR A history already exists for identifier {id}'");
+                var index = historyOfObservation[id].FindIndex(x => timeStamp.Equals(x.TimeStamp));
+                historyOfObservation[id][index].Data = data;
+
+                return data;
             }
+            else if (historyOfObservation.ContainsKey(id))
+            {
+                historyOfObservation[id].Add(new Observation(timeStamp, data));
+                var priorData = historyOfObservation[id].Last();
+                return priorData.Data;
+            }
+            return null;
         }
 
-        public void Update(int id,long timeStamp, string data)
-        {
-            if (!DoesKeyAndTimeExist(id,timeStamp))
-                {
-                    var newob = new Observation(timeStamp, data);
-                    historyOfObservation[id].Add(newob);
-                    var priorob = historyOfObservation[id].ElementAt(historyOfObservation[id].Count() - 2);
-                    PrintData(priorob.Data);
-                }
-                else if(historyOfObservation.ContainsKey(id))
-                {
-                    FindObservation(id, timeStamp).TimeStamp = timeStamp;
-                    PrintData(FindObservation(id, timeStamp).Data);
-                    FindObservation(id, timeStamp).Data = data;
-                }
-        }
-
-        public void Delete(int id, long timeStamp)
+        public string Delete(int id, long timeStamp)
         {
             if (historyOfObservation.ContainsKey(id))
             {
-                Get(id, timeStamp);
-                var compareTo = historyOfObservation[id].Select(x => x.TimeStamp.CompareTo(timeStamp)).ToList();
-                var findIndex = compareTo.FindIndex(x => x >= 0);
-                int range = historyOfObservation[id].Count() - findIndex;
-                historyOfObservation[id].RemoveRange(findIndex, range);
-            } else {
-
-                Console.WriteLine("ERR There is no avaliable observations");
+                var currentObservarionData = Get(id, timeStamp);
+                var findIndex = historyOfObservation[id].RemoveAll(x => x.TimeStamp > timeStamp);
+                return currentObservarionData;
             }
+
+            return ErrMessageNoHistoryExist(id);
+
         }
 
-        public void Delete(int id)
+        public string Delete(int id)
         {
-            if (!historyOfObservation.ContainsKey(id))
+            if (historyOfObservation.ContainsKey(id))
             {
-                PrintErrorMsgNoHistoryExist(id);
-            } else{
-                var ob = FindObservation(id, MaxTimeStamp(id));
-                PrintData(ob.Data);
+                var ob = historyOfObservation[id].OrderBy(x => x.TimeStamp).Last();
                 historyOfObservation.Remove(id);
+                return $"{ob.Data}";
             }
-        }
 
-        public void Get(int id, long timeStamp)
+            return ErrMessageNoHistoryExist(id);
+
+
+        }
+        public string Get(int id, long timeStamp)
         {
             if (!historyOfObservation.ContainsKey(id))
             {
-                PrintErrorMsgNoHistoryExist(id);
-            } else {
-                var difference = historyOfObservation[id].Select(x => Math.Abs(x.TimeStamp - timeStamp)).ToList();
-                var minValue = difference.Min();
-                var i = difference.FindIndex(x => x.Equals(minValue));
-                var ob = historyOfObservation[id][i];
-                PrintData(ob.Data);
+                return ErrMessageNoHistoryExist(id);
             }
+            else if (timeStamp < (historyOfObservation[id].Min(x => x.TimeStamp)))
+            {
+                return $"ERR There are no avaliable obseration";
+            }
+            var difference = historyOfObservation[id].Select(x => timeStamp - x.TimeStamp).ToList();
+            var minValue = difference.Where(x => x >= 0).Min();
+            var i = difference.FindIndex(x => x.Equals(minValue));
+            return historyOfObservation[id][i].Data;
         }
 
-        public void Latest(int id)
+        public string Latest(int id)
         {
             if (!historyOfObservation.ContainsKey(id))
             {
-                PrintErrorMsgNoHistoryExist(id);
-            } else {
-                var ob = FindObservation(id, MaxTimeStamp(id));
-                Console.WriteLine($"OK {ob.TimeStamp} {ob.Data}");
+                return ErrMessageNoHistoryExist(id);
             }
+
+            var maxTimeStamp = historyOfObservation[id].Max(x => x.TimeStamp);
+
+            var z = Get(id, maxTimeStamp);
+
+            var latestIs = string.Join(' ', maxTimeStamp, z);
+
+            return latestIs;
+
         }
 
-        public void PrintErrorMsgNoHistoryExist(int id)
+        public string ErrMessageNoHistoryExist(int id)
         {
-            Console.WriteLine($"ERR No history exists for identifier '{id}'");
-        }
-
-        public void PrintData(string data)
-        {
-            Console.WriteLine($"OK {data}");
-        }
-
-        public bool DoesKeyAndTimeExist(int id, long timeStamp)
-        {
-            return historyOfObservation[id].Any(x => x.TimeStamp.Equals(timeStamp)) && historyOfObservation.ContainsKey(id);
-        }
-
-        public Observation FindObservation(int id, long timeStamp)
-        {
-            int i = historyOfObservation[id].FindIndex(x => x.TimeStamp.Equals(timeStamp));
-
-            return historyOfObservation[id][i];
-        }
-
-        public long MaxTimeStamp(int id)
-        {
-            return historyOfObservation[id].Max(x => x.TimeStamp);
+            return $"ERR A history already exists for identifier {id}";
         }
     }
 }

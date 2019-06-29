@@ -7,12 +7,13 @@ namespace DataStructureTask
     //Read users Input 
     public class ReadUserEntry : IReadUserEntry
     {
+        public string userStringInput { get; set; }
         public string Command { get; set; }
         public int Index { get; set; }
         public long TimeStamp { get; set; }
         public string Data { get; set; }
-        public int Quit { get; set; } = 0;
-        Dictionary<string,int> allCommands = new Dictionary<string, int>{ { "GET",3 } ,{ "LATEST", 2 }, { "DELETE", 2 }, { "QUIT", 1 }, { "CREATE", 4 }, { "UPDATE", 4 } };
+        public bool Quit { get; set; }
+        List<ExpectedInput> allCommands = new List<ExpectedInput>(){new ExpectedInput( "GET",3,true,true) ,new ExpectedInput("LATEST", 2,true,false), new ExpectedInput( "DELETE", 2,true,false ), new ExpectedInput( "QUIT", 1,false,false ),  new ExpectedInput( "CREATE", 4,true,true ), new ExpectedInput("UPDATE", 4,true,true ), new ExpectedInput("DELETE", 3,true,true) };
         IHistory _history;
 
         public ReadUserEntry(IHistory history)
@@ -20,110 +21,105 @@ namespace DataStructureTask
             _history = history ?? throw new ArgumentNullException(nameof(history));
         }
 
-        public Dictionary<int,List<Observation>> ProcessInput(string input)
+        public string ProcessInput(string input)
         {
             var userInput = ReadingStringInput(input);
+
             if (IsValidInput(userInput))
             {
                 switch (userInput[0])
                 {
                     case "CREATE":
-                            _history.Create(Index, TimeStamp, Data);                           
-                        break;
+                        return _history.Create(Index, TimeStamp, Data);
                     case "UPDATE":
-                            _history.Update(Index, TimeStamp, Data);                        
-                        break;
+                        return _history.Update(Index, TimeStamp, Data);
                     case "GET":
-                            _history.Get(Index, TimeStamp);                        
-                        break;
+                        return _history.Get(Index, TimeStamp);
                     case "LATEST":
-                            _history.Latest(Index);                        
-                        break;
+                        return _history.Latest(Index);
                     case "DELETE":
                         if (userInput.Count().Equals(3))
                         {
-                             _history.Delete(Index, TimeStamp);
-                        } else if (userInput.Count().Equals(2))
-                        {
-                             _history.Delete(Index);
+                            return _history.Delete(Index, TimeStamp);
                         }
-                        break;
+                        return _history.Delete(Index);
                     case "QUIT":
-                        Quit += 1;
-                        break;
+                        Quit = true;
+                        return null;
                 }
+
             }
 
-            return _history.GetHistoryOfObservationData();
+            return "ERR Invalid format";
+        }
+
+        public bool IsValidInput(string[] userInput)
+        {
+            var isValid = allCommands.Any(x =>
+            x.command.Contains(userInput[0]) &&
+            x.ParameterCount.Equals(userInput.Count()) &&
+            x.needsIndex.Equals(IsIndexValid(userInput)) &&
+            x.needsTimeStamp.Equals((IsTimeStampValid(userInput))));
+
+            this.Command = userInput[0];
+            if (userInput.Count().Equals(4))
+            {
+                Data = userInput[3];
+            }
+
+            return isValid;
 
         }
 
-        private bool IsValidInput(string[] userInput)
+        public bool IsIndexValid(string[] userInput)
         {
-            bool val = false;
-
-            if ((allCommands.ContainsKey(userInput[0]) && allCommands[userInput[0]].Equals(userInput.Count())) || (userInput[0].Equals("DELETE") && userInput.Count().Equals(3)))
+            bool isValid = false;
+            try
             {
-                switch (userInput.Count())
+                isValid = int.TryParse(userInput[1], out int i);
+                if (isValid)
                 {
-                    case 1:
-                        val = allCommands.ContainsKey(userInput[0]);
-                        break;
-                    case 2:
-                        val = IsIndexValid(userInput);
-                        if (val)
-                        {
-                            this.Command = userInput[0];
-                            Int32.TryParse(userInput[1], out int id4);
-                            this.Index = id4;
-                        }
-                        break;
-                    case 3:
-                    case 4:
-                        val = IsIndexValid(userInput) && IsTimeStampValid(userInput);
-                        if (val)
-                        {
-                            this.Command = userInput[0];
-                            Int32.TryParse(userInput[1], out int id4);
-                            this.Index = id4;
-                            long.TryParse(userInput[2], out long timeStamp4);
-                            this.TimeStamp = timeStamp4;
-                            if (userInput.Count().Equals(4))
-                            {
-                                this.Data = userInput[3];
-                            }
-                        }
-                        break;
+                    Index = i;
+                    return isValid;
                 }
+
             }
-            if (!val) {
-                Console.WriteLine("ERR Invalid query format.");
+            catch (Exception)
+            {
+                return isValid;
+
             }
 
-            return val;
+            return isValid;
+
         }
 
-        private bool IsIndexValid(string[] userInput)
+        public bool IsTimeStampValid(string[] userInput)
         {
-            if (!int.TryParse(userInput[1], out int i))
+            bool isValid = false;
+            try
             {
-                Console.WriteLine("ERR Invalid index. Must be a int.");
-            }
-            return true;
-        }
+                isValid = long.TryParse(userInput[2], out long i);
+                if (isValid)
+                {
+                    TimeStamp = i;
+                    return isValid;
+                }
 
-        private bool IsTimeStampValid(string[] userInput)
-        {
-            if (!long.TryParse(userInput[2], out long i))
+            }
+            catch (Exception)
             {
-
-                Console.WriteLine("ERR Invalid TimeStamp. Must be a long.");
+                return isValid;
             }
-            return true;
+
+            return isValid;
+
+
         }
 
         private string[] ReadingStringInput(string userInput)
         {
+            this.userStringInput = userInput;
             var splitArray = userInput.ToUpper().Split(' ');
             var cleanArray = splitArray.Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             return cleanArray;

@@ -11,7 +11,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.1" />
     <PackageReference Include="Moq" Version="4.11.0" />
-    <PackageReference Include="FluentAssertions" Version="5.7.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +18,5 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ExecuteUserInputTest.cs" />
-    <Compile Remove="HistoryTest.cs" />
   </ItemGroup>
 </Project>

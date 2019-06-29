@@ -18,32 +18,20 @@ namespace DataStructureTask
 
             var history = container.Resolve<IHistory>();
             var readUser = container.Resolve<IReadUserEntry>();
-            
 
-            string path = "/Users/hongle/Projects/DataStructureTask/DataStructureTask/TestEntry.txt";
-            FileInfo file = new FileInfo(path);
-            var lines = File.ReadAllLines(path).ToList();
 
-            foreach (var query in lines)
+
+            while (readUser.Quit == false)
             {
-                Console.WriteLine(query);
-                readUser.ProcessInput(query);
+                string userInput = Console.ReadLine();
+                var output = readUser.ProcessInput(userInput);
+                if (!output.Equals(null))
+                {
+                    Console.WriteLine($"OK {output}");
+                }
             }
 
-           var i =  history.GetHistoryOfObservationData();
 
-
-
-
-
-
-
-            //while (readUser.Quit == 0)
-            //{
-            //    string userInput = Console.ReadLine();
-            //    readUser.ProcessInput(userInput);
-
-            //}
         }
     }
 }

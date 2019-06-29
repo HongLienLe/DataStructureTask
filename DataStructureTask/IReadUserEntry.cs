@@ -5,7 +5,7 @@ namespace DataStructureTask
 {
     public interface IReadUserEntry
     {
-        Dictionary<int, List<Observation>> ProcessInput(string userInput);
-        int Quit { get; set; }
+        string ProcessInput(string userInput);
+        bool Quit { get; set; }
     }
 }
