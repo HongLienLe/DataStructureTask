@@ -11,13 +11,12 @@ namespace DataStructureTaskTest
     public class ReadUserInputTest
     {
         ReadUserEntry _ReadUserTest;
-        History _history;
 
         [SetUp]
         public void SetUp()
         {
-             _history = new History();
-            _ReadUserTest = new ReadUserEntry(_history);
+            var _history = new Mock<IHistory>();
+            _ReadUserTest = new ReadUserEntry(_history.Object);
         }
 
         [Test]
@@ -32,16 +31,15 @@ namespace DataStructureTaskTest
                 var x = _ReadUserTest.ProcessInput(query);
                 Console.WriteLine(x);
             }
-
         }
 
         [Test]
         public void given_input_valid_incorrect_format_then_return_ERRMessage()
         {
-            string testIput = "UPDATE 1  4  TEST";
+            string testIput = "CREATE 1  TEST  4";
             var value = _ReadUserTest.ProcessInput(testIput);
 
-            Assert.AreEqual("ERR A history already exists for identifier 1", value);
+            Assert.AreEqual("ERR Invalid format", value);
         }
 
         [Test]

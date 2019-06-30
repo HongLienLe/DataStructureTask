@@ -18,7 +18,7 @@ namespace DataStructureTask
         }
 
         public string Create(int id, long timeStamp, string data)
-        {
+        { 
             if (!historyOfObservation.ContainsKey(id)) {
                 
                 historyOfObservation.Add(id, new List<Observation>() { new Observation(timeStamp, data) });
